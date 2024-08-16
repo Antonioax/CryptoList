@@ -4,7 +4,7 @@ const { data } = await useFetch("/api/tickers/?limit=10");
 
 <template>
   <main>
-    <h1>Index Page</h1>
+    <h1 class="bg-red-200">Index Page</h1>
 
     <div>
       <div v-for="currency in data.data" :key="data.data.id">
