@@ -1,17 +1,48 @@
 <script setup>
-const { data } = await useFetch("/api/tickers/?limit=10");
+import { ref } from "vue";
+
+const { data } = await useFetch(`/api/tickers/?limit=10`);
+
+const coins = ref(data.value.data);
+const limit = ref(10);
+
+watch(limit, () => {
+  fetchCoins();
+});
+
+async function fetchCoins() {
+  try {
+    const { data } = await $fetch(`/api/tickers/?limit=${limit.value}`);
+    console.log(data);
+    coins.value = data;
+  } catch (error) {
+    console.error("Error fetching coins:", error);
+  }
+}
 </script>
 
 <template>
   <main class="flex flex-col justify-center items-center mt-20">
     <h1 class="text-4xl">Crypto List</h1>
 
-    <div class="flex flex-col gap-1 mt-10 w-[500px] max-w-[90%]">
-      <div
-        v-for="(currency, index) in data.data"
-        :key="data.data.id"
-      >
-        <NuxtLink :to="'/currency/' + currency.id" class="flex hover:bg-emerald-200 py-2 sm:px-4 rounded-lg hover:shadow-xl">
+    <div class="flex flex-col gap-1 mt-10 mb-20 w-[500px] max-w-[90%]">
+      <div class="mb-10 self-end">
+        TOP
+        <select v-model="limit" class="">
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+
+      <div v-for="(currency, index) in coins" :key="currency.id">
+        <NuxtLink
+          :to="'/currency/' + currency.id"
+          class="flex hover:bg-emerald-200 py-2 sm:px-4 rounded-lg hover:shadow-xl"
+        >
           <div class="w-6 text-right mr-2">{{ index + 1 }}.</div>
           <div class="flex-1">{{ currency.name }}</div>
           <div class="flex-1 text-center">{{ currency.symbol }}</div>
