@@ -18,11 +18,13 @@ const coin = data.value[0];
         <div class="flex-1 text-left">
           {{
             coin.rank +
-            (+coin.rank % 10 === 1
+            (+coin.rank === 11 || +coin.rank === 12 || +coin.rank === 13
+              ? "th"
+              : +coin.rank % 10 === 1
               ? "st"
               : +coin.rank % 10 === 2
               ? "nd"
-              : +coin.rank % 10 === 3
+              : +coin.rank % 10 === 3 
               ? "rd"
               : "th")
           }}

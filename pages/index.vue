@@ -1,14 +1,12 @@
 <script setup>
 import { ref } from "vue";
+import { useRoute, useRouter } from "#app";
 
-const { data } = await useFetch(`/api/tickers/?limit=10`);
+const route = useRoute();
+const router = useRouter();
 
-const coins = ref(data.value.data);
-const limit = ref(10);
-
-watch(limit, () => {
-  fetchCoins();
-});
+const coins = ref([]);
+const limit = ref(Number(route.query.limit) || 10);
 
 async function fetchCoins() {
   try {
@@ -19,6 +17,26 @@ async function fetchCoins() {
     console.error("Error fetching coins:", error);
   }
 }
+
+watch(
+  () => route.query.limit,
+  (newLimit) => {
+    limit.value = Number(newLimit) || 10;
+    fetchCoins();
+  },
+  { immediate: true } // Fetch immediately on component mount
+);
+
+watch(limit, (newLimit) => {
+  if (newLimit !== Number(route.query.limit)) {
+    router.push({
+      path: route.path,
+      query: { ...route.query, limit: newLimit },
+    });
+  }
+});
+
+fetchCoins();
 </script>
 
 <template>
@@ -28,7 +46,7 @@ async function fetchCoins() {
     <div class="flex flex-col gap-1 mt-10 mb-20 w-[500px] max-w-[90%]">
       <div class="mb-10 self-end">
         TOP
-        <select v-model="limit" class="">
+        <select v-model="limit" class="bg-emerald-50">
           <option value="5">5</option>
           <option value="10">10</option>
           <option value="15">15</option>
