@@ -7,14 +7,18 @@ const router = useRouter();
 
 const coins = ref([]);
 const limit = ref(Number(route.query.limit) || 10);
+const isLoading = ref(true);
 
 async function fetchCoins() {
+  isLoading.value = true;
   try {
     const { data } = await $fetch(`/api/tickers/?limit=${limit.value}`);
     console.log(data);
     coins.value = data;
   } catch (error) {
     console.error("Error fetching coins:", error);
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -56,7 +60,13 @@ fetchCoins();
         </select>
       </div>
 
-      <div v-for="(currency, index) in coins" :key="currency.id">
+      <div v-if="isLoading" class="mt-20 text-center">Loading...</div>
+
+      <div
+        v-if="!isLoading"
+        v-for="(currency, index) in coins"
+        :key="currency.id"
+      >
         <NuxtLink
           :to="'/currency/' + currency.id"
           class="flex hover:bg-emerald-200 py-2 sm:px-4 rounded-lg hover:shadow-xl"
